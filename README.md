@@ -1,3 +1,4 @@
+![pressure](pressure.png)
 # UnderPressure
 Trabalho 3 de redes: compactador e descompatador de texto utilizando LZW
 
