@@ -8,7 +8,8 @@ def parse_args():
     group.add_argument("-c", "--compress", help="comprime o texto dado", action="store_true")
     group.add_argument("-x", "--extract", help="decomprime o texto dado", action="store_true")
     parser.add_argument("-b", "--base64", help="para textos não ASCII, utiliza essa opção para convertê-los para base64 antes", action="store_true")
-    #parser.add_argument("file", type=file, help="arquivo de texto para ser comprimido")
+    parser.add_argument("input", type=file, help="arquivo de texto para ser comprimido")
+    parser.add_argument("output", help="nome do arquivo de saida")
     return parser.parse_args()
 
 
