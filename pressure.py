@@ -12,16 +12,34 @@ def parse_args():
     parser.add_argument("output", help="nome do arquivo de saida")
     return parser.parse_args()
 
+def compress(filename, base64, output):
+    # tem que ler o arquivo aqui
+    text = filename
+    if(base64):
+        text = encodeBase64(text)
+    writeFile(output, text)
+
+def extract(filename, base64, output):
+    text = filename
+    # extrai e DEPOIS tira do base64
+    if(base64):
+        text = decodeBase64(text)
+    return text
+
+def encodeBase64(text):
+    print "Encoding in base64"
+
+def decodeBase64(text):
+    print "Decoding in base64"
+
+def writeFile(filename, text):
+    print "escrevendo arquivo..."
 
 def main(args):
-    base64 = False
     if args.compress:
-        print "Compress"
+        compress(args.input, args.base64, args.output)
     if args.extract:
-        print "Extract"
-    if args.base64:
-        print "Base64"
-        base64 = True
+        extract(args.input, args.base64, args.output)
 
 if __name__ == "__main__":
     args = parse_args()
