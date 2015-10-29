@@ -3,7 +3,7 @@ import argparse
 import base64
 import logging
 
-def parse_args():
+def parseArgs():
     # parser para os argumentos
     parser = argparse.ArgumentParser(description="UnderPressure: Comprime textos usando LZW", prog="pressure")
     group = parser.add_mutually_exclusive_group()
@@ -16,13 +16,14 @@ def parse_args():
     return parser.parse_args()
 
 def compress(inputFile, base64, output):
-    verbose("Comprimindo arquivo", inputFile)
+    verbose("Comprimindo arquivo", inputFile.name)
     text = inputFile.read()
     if(base64):
         text = encodeBase64(text)
     writeFile(output, text)
 
 def extract(inputFile, base64, output):
+    verbose("Descomprimindo arquivo", inputFile.name)
     text = inputFile.read()
     # extrai e DEPOIS tira do base64
     if(base64):
@@ -56,7 +57,7 @@ def main(args):
         print "Nenhuma opção foi escolhida. Saindo."
 
 if __name__ == "__main__":
-    args = parse_args()
+    args = parseArgs()
     if(args.verbose):
         def verbose(*args):
             for arg in args:
