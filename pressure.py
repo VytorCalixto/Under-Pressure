@@ -21,15 +21,65 @@ def compress(inputFile, base64, output):
     # codifica em base64 e compacta
     if(base64):
         text = encodeBase64(text)
-    writeFile(output, text)
+    # LZW em si
+    dictSize = 256 # tamanho da tabela ASCII
+    dictionary = {}
+    # xrange usado por performance
+    for i in xrange(dictSize):
+        dictionary[chr(i)] = i
+    compressed = []
+
+    w = ""
+    for c in text:
+        wc = w + c
+        if wc in dictionary:
+            w = wc
+        else:
+            compressed.append(dictionary[w])
+            dictionary[wc] = dictSize
+            ++dictSize
+            w = c
+    if w:
+        compressed.append(dictionary[w])
+
+    # writeFile(output, compressed)
+    f = open(output, "wb")
+    byteArray = bytearray(compressed)
+    f.write(byteArray)
+    f.close()
 
 def extract(inputFile, base64, output):
     verbose("Descomprimindo arquivo", inputFile.name)
     text = inputFile.read()
-    # extrai e DEPOIS descodifica do base64
-    if(base64):
-        text = decodeBase64(text)
-    writeFile(output, text)
+    
+    # extrai e DEPOIS decodifica do base64
+    dictSize = 256
+    dictionary = {}
+    for i in xrange(dictSize):
+        dictionary[i] = chr(i)
+    if text:
+        w = chr(text.pop(0))
+    else:
+        raise ValueError, "empty"
+    result = [w]
+    for k in text:
+        if k in dictionary:
+            entry = dictionary[k]
+        elif k == len(dictionary):
+            entry = w + w[0]
+        else:
+            raise ValueError, "Bad compressed k: %d" % k
+        result.append(entry)
+        dictionary[dictSize] = w + entry[0]
+        ++dictSize
+
+        w = entry
+    print result
+    #if(base64):
+    #    text = decodeBase64(text)
+
+
+    # writeFile(output, text)
 
 def encodeBase64(text):
     verbose("Codificando em Base64")
