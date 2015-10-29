@@ -18,6 +18,7 @@ def parseArgs():
 def compress(inputFile, base64, output):
     verbose("Comprimindo arquivo", inputFile.name)
     text = inputFile.read()
+    # codifica em base64 e compacta
     if(base64):
         text = encodeBase64(text)
     writeFile(output, text)
@@ -25,7 +26,7 @@ def compress(inputFile, base64, output):
 def extract(inputFile, base64, output):
     verbose("Descomprimindo arquivo", inputFile.name)
     text = inputFile.read()
-    # extrai e DEPOIS tira do base64
+    # extrai e DEPOIS descodifica do base64
     if(base64):
         text = decodeBase64(text)
     writeFile(output, text)
