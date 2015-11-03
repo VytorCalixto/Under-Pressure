@@ -1,6 +1,8 @@
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import argparse
 import base64
+import struct
 
 def parseArgs():
     # parser para os argumentos
@@ -36,20 +38,16 @@ def compress(inputFile, base64, output):
         else:
             compressed.append(dictionary[w])
             dictionary[wc] = dictSize
-            ++dictSize
+            dictSize += 1
             w = c
     if w:
         compressed.append(dictionary[w])
 
-    # writeFile(output, compressed)
-    f = open(output, "wb")
-    byteArray = bytearray(compressed)
-    f.write(byteArray)
-    f.close()
+    writeBinaryFile(output, compressed)
 
 def extract(inputFile, base64, output):
     verbose("Descomprimindo arquivo", inputFile.name)
-    text = inputFile.read()
+    text = readBinaryFile(inputFile.name)
     
     # extrai e DEPOIS decodifica do base64
     dictSize = 256
@@ -73,12 +71,11 @@ def extract(inputFile, base64, output):
         ++dictSize
 
         w = entry
-    print result
-    #if(base64):
-    #    text = decodeBase64(text)
+    # Decodifica base64
+    if(base64):
+        text = decodeBase64(text)
 
-
-    # writeFile(output, text)
+    writeFile(output, text)
 
 def encodeBase64(text):
     verbose("Codificando em Base64")
@@ -91,6 +88,26 @@ def decodeBase64(text):
     decoded = base64.b64decode(text)
     verbose("Decodificado!")
     return decoded
+
+def writeBinaryFile(filename, array):
+    verbose("Escrevendo arquivo binário...")
+    f = open(filename, "wb")
+    for a in array:
+        f.write(struct.pack("!i", a))
+    f.close()
+    verbose("Feito!")
+
+def readBinaryFile(filename):
+    f = open(filename, "rb")
+    data = []
+    byte = f.read(1)
+    data.append(byte)
+    while byte != "":
+        byte = f.read(1)
+        data.append(byte)
+    f.close()
+    print data
+    return data
 
 def writeFile(filename, text):
     verbose("Escrevendo arquivo de saída")
