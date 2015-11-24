@@ -56,7 +56,12 @@ def extract(inputFile, base64, output):
     for i in xrange(dictSize):
         dictionary[i] = chr(i)
     if text:
-        w = chr(text.pop(0))
+        w = text.pop(0)
+        if w > 255:
+            print "ERRO: o arquivo não é válido. Talvez ele não esteja compactado."
+            verbose("Primeiro índice do arquivo é maior que 255:", w)
+            sys.exit(1)
+        w = chr(w)
     else:
         raise ValueError, "empty"
     uncompressed = [w]
