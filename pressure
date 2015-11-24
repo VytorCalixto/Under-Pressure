@@ -3,6 +3,7 @@
 import argparse
 import base64
 import struct
+import sys
 
 def parseArgs():
     # parser para os argumentos
@@ -48,7 +49,7 @@ def compress(inputFile, base64, output):
 def extract(inputFile, base64, output):
     verbose("Descomprimindo arquivo", inputFile.name)
     text = readBinaryFile(inputFile.name)
-    
+
     # extrai e DEPOIS decodifica do base64
     dictSize = 256
     dictionary = {}
@@ -58,19 +59,22 @@ def extract(inputFile, base64, output):
         w = chr(text.pop(0))
     else:
         raise ValueError, "empty"
-    result = [w]
+    uncompressed = [w]
     for k in text:
         if k in dictionary:
             entry = dictionary[k]
         elif k == len(dictionary):
             entry = w + w[0]
         else:
-            raise ValueError, "Bad compressed k: %d" % k
-        result.append(entry)
+            # raise ValueError, "Bad compressed k: %d" % k
+            pass
+        uncompressed.append(entry)
         dictionary[dictSize] = w + entry[0]
-        ++dictSize
-
+        dictSize += 1
         w = entry
+
+    text = ''.join(uncompressed)
+
     # Decodifica base64
     if(base64):
         text = decodeBase64(text)
@@ -93,26 +97,34 @@ def writeBinaryFile(filename, array):
     verbose("Escrevendo arquivo binário...")
     f = open(filename, "wb")
     for a in array:
-        f.write(struct.pack("!i", a))
+        f.write(struct.pack("!I", a))
     f.close()
     verbose("Feito!")
 
 def readBinaryFile(filename):
     f = open(filename, "rb")
     data = []
-    byte = f.read(1)
-    data.append(byte)
-    while byte != "":
-        byte = f.read(1)
-        data.append(byte)
+    byte = []
+    for i in range(0,4):
+        readChr = f.read(1)
+        byte.append('{0:08b}'.format(ord(readChr)))
+    data.append(int(''.join(byte), 2))
+    while readChr != "":
+        byte = []
+        for i in range(0,4):
+            readChr = f.read(1)
+            if readChr != "":
+                byte.append('{0:08b}'.format(ord(readChr)))
+        if len(byte) > 0:
+            data.append(int(''.join(byte), 2))
     f.close()
-    print data
     return data
 
 def writeFile(filename, text):
     verbose("Escrevendo arquivo de saída")
     f = open(filename, "w")
     f.write(text)
+    f.close()
     verbose("Feito")
 
 def main(args):
