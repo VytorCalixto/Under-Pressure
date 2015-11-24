@@ -1,0 +1,11 @@
+before_script:
+    - wget http://www.gutenberg.org/cache/epub/2600/pg2600.txt -O war-and-peace.txt
+    - wget http://www.gutenberg.org/cache/epub/2701/pg2701.txt -O moby-dick.txt
+    - wget http://www.gutenberg.org/cache/epub/135/pg135.txt -O les-miserables.txt
+
+job1:
+    script:
+        - ./test.sh
+    tags:
+        - docker
+        - mysql
